@@ -17,6 +17,9 @@ func main() {
 			fmt.Println("error while reading command: ", err)
 		}
 
+		if strings.TrimSpace(command) == "exit 0" {
+			os.Exit(0)
+		}
 		fmt.Fprintf(os.Stdout, "%s: command not found\n", strings.TrimSpace(command))
 	}
 }
