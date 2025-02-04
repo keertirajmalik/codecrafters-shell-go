@@ -7,6 +7,12 @@ import (
 	"strings"
 )
 
+const (
+	Exit = "exit"
+	Echo = "echo"
+	Type = "type"
+)
+
 func main() {
 	for {
 		fmt.Fprint(os.Stdout, "$ ")
@@ -17,18 +23,33 @@ func main() {
 			fmt.Println("error while reading command: ", err)
 			return
 		}
-		command = strings.TrimSpace(command)
-		if command == "exit 0" {
-			os.Exit(0)
-		}
 
 		commandArgs := strings.Fields(command)
 		switch commandArgs[0] {
+		case "exit":
+			os.Exit(0)
+
 		case "echo":
 			fmt.Println(strings.Join(commandArgs[1:], " "))
 
+		case "type":
+			fmt.Println(checkBuiltInCommand(commandArgs[1]))
+
 		default:
-			fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
+			fmt.Printf("%s: command not found\n", strings.TrimSpace(command))
 		}
 	}
+}
+
+func checkBuiltInCommand(command string) string {
+	var supportedCommands = map[string]bool{
+		Exit: true,
+		Echo: true,
+		Type: true,
+	}
+
+	if !supportedCommands[command] {
+		return fmt.Sprintf("%s: not found", command)
+	}
+	return fmt.Sprintf("%s is a shell builtin", command)
 }
