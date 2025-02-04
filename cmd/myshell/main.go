@@ -15,11 +15,20 @@ func main() {
 		command, err := bufio.NewReader(os.Stdin).ReadString('\n')
 		if err != nil {
 			fmt.Println("error while reading command: ", err)
+			return
 		}
-
-		if strings.TrimSpace(command) == "exit 0" {
+		command = strings.TrimSpace(command)
+		if command == "exit 0" {
 			os.Exit(0)
 		}
-		fmt.Fprintf(os.Stdout, "%s: command not found\n", strings.TrimSpace(command))
+
+		commandArgs := strings.Fields(command)
+		switch commandArgs[0] {
+		case "echo":
+			fmt.Println(strings.Join(commandArgs[1:], " "))
+
+		default:
+			fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
+		}
 	}
 }
