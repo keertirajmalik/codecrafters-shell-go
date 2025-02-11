@@ -14,6 +14,8 @@ const (
 )
 
 func main() {
+	path := os.Getenv("PATH")
+
 	for {
 		fmt.Fprint(os.Stdout, "$ ")
 
@@ -26,30 +28,17 @@ func main() {
 
 		commandArgs := strings.Fields(command)
 		switch commandArgs[0] {
-		case "exit":
+		case Exit:
 			os.Exit(0)
 
-		case "echo":
+		case Echo:
 			fmt.Println(strings.Join(commandArgs[1:], " "))
 
-		case "type":
-			fmt.Println(checkBuiltInCommand(commandArgs[1]))
+		case Type:
+			fmt.Println(checkBuiltInCommand(commandArgs[1], path))
 
 		default:
 			fmt.Printf("%s: command not found\n", strings.TrimSpace(command))
 		}
 	}
-}
-
-func checkBuiltInCommand(command string) string {
-	var supportedCommands = map[string]bool{
-		Exit: true,
-		Echo: true,
-		Type: true,
-	}
-
-	if !supportedCommands[command] {
-		return fmt.Sprintf("%s: not found", command)
-	}
-	return fmt.Sprintf("%s is a shell builtin", command)
 }
