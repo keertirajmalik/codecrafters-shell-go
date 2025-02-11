@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func checkBuiltInCommand(command, path string) string {
+func checkBuiltInCommand(command string) string {
 	var supportedCommands = map[string]bool{
 		Exit: true,
 		Echo: true,
@@ -18,17 +18,20 @@ func checkBuiltInCommand(command, path string) string {
 		return fmt.Sprintf("%s is a shell builtin", command)
 	}
 
-	for _, envPath := range strings.Split(path, ":") {
-		executablePath := envPath + "/" + command
-		if checkExecutableExist(executablePath) {
-			return fmt.Sprintf("%s is %s", command, executablePath)
-		}
+	ok, path := checkExecutableExist(command)
+	if ok {
+		return fmt.Sprintf("%s is %s", command, path)
 	}
 	return fmt.Sprintf("%s: not found", command)
 }
 
-func checkExecutableExist(path string) bool {
-	_, err := os.Stat(path)
-
-	return !errors.Is(err, os.ErrNotExist)
+func checkExecutableExist(command string) (bool, string) {
+	for _, envPath := range strings.Split(os.Getenv("PATH"), ":") {
+		executablePath := envPath + "/" + command
+		_, err := os.Stat(executablePath)
+		if !errors.Is(err, os.ErrNotExist) {
+			return true, executablePath
+		}
+	}
+	return false, ""
 }
